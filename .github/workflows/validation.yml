@@ -17,13 +17,13 @@ jobs:
         run: uv python install
 
       - name: Install dependencies
-        run: uv sync --locked --all-extras --dev
+        run: uv sync --locked --all-packages --all-groups
 
       - name: Format code
         run: uvx ruff format . --exit-non-zero-on-format
 
       - name: Lint code
-        run: make lint
+        run: uvx ruff check .
 
       - name: Run tests
-        run: make test
+        run: uv run --all-packages --all-groups pytest

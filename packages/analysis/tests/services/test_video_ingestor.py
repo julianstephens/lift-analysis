@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -98,3 +99,10 @@ def test_extract_frames_creates_directory_and_extracts_at_interval(
             overwrite_output=True,
             quiet=True,
         )
+
+    manifest = json.loads((frame_dir / "manifest.json").read_text())
+    assert manifest["frames_by_time"] == {
+        "0": "./frame_00000.jpg",
+        "200": "./frame_00001.jpg",
+        "400": "./frame_00002.jpg",
+    }
