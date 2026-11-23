@@ -3,6 +3,7 @@ from pathlib import Path
 
 import ffmpeg
 
+from analysis.models import FrameManifest
 from analysis.services.errors import OpenVideoStreamError
 
 
@@ -59,9 +60,17 @@ class VideoIngestor:
         )
         if not frame_dir.exists():
             frame_dir.mkdir(parents=True, exist_ok=True)
+        total_duration_ms = self._get_duration_safe()
+
+        manifest = FrameManifest(
+            video_name=str(self.video_path.stem),
+            total_duration_ms=total_duration_ms,
+            sample_interval_ms=sample_interval_ms,
+            frames_by_time={},
+        )
 
         for i, current_time in enumerate(
-            range(0, self._get_duration_safe(), sample_interval_ms)
+            range(0, total_duration_ms, sample_interval_ms)
         ):
             self._log.debug("extracting frame %d at time %d ms", i, current_time)
             stream = self._open_video_stream(ss=current_time / 1000.0)
@@ -74,3 +83,10 @@ class VideoIngestor:
                 **{"qscale:v": 2},
             ).run(overwrite_output=True, quiet=True)
             self._log.debug("frame %d saved", i)
+            manifest.frames_by_time[current_time] = str(f"./frame_{i:05d}.jpg")
+        Path(frame_dir / "manifest.json").write_text(manifest.model_dump_json(indent=2))
+        self.video_path.copy(output_dir / self.video_path.name)
+        self._log.info(
+            "frame extraction complete, manifest saved to %s",
+            frame_dir / "manifest.json",
+        )

@@ -14,4 +14,4 @@ analysis = { workspace = true }
 line-length = 88
 
 [tool.ruff.lint]
-select = ["W", "E", "F", "N", "B", "RET", "SIM", "G", "TRY", "LOG", "RUF"]
+select = ["W", "E", "F", "N", "B", "RET", "SIM", "G", "TRY", "LOG", "RUF", "I"]
