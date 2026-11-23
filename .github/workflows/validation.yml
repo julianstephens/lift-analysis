@@ -23,7 +23,7 @@ jobs:
         run: uvx ruff format . --exit-non-zero-on-format
 
       - name: Lint code
-        run: make lint
+        run: uvx ruff check .
 
       - name: Run tests
-        run: make test
+        run: uvx pytest tests
